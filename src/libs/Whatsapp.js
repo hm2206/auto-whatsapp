@@ -56,6 +56,14 @@ class Whatsapp {
     }
 
     onMessage (callback = null) {
+
+        const deleteTilde = (texto) => {
+            return texto
+                   .normalize('NFD')
+                   .replace(/([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+/gi,"$1")
+                   .normalize();
+        }
+
         this.client.on('message', msg => {
             let command = `${msg.body}`.toLowerCase();
             let response = null;
@@ -63,7 +71,7 @@ class Whatsapp {
             // obtener respuesta
             for (let posibility in DB) {
                 let regx = new RegExp(`${posibility}+`);
-                let is_response = regx.test(command);
+                let is_response = regx.test(deleteTilde(command));
                 if (!is_response) continue;
                 // manejar respuesta
                 let arrayResponse = DB[posibility];
